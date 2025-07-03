@@ -47,7 +47,7 @@ pipeline {
 
         stage('Deploy container') {
             steps {
-                ssh '''
+                sh '''
                     docker pull $DOCKERHUB_CREDENTIALS_ID/$IMAGE_NAME:$IMAGE_TAG
                     docker stop mid-java-gradle-app || true
                     docker rm mid-java-gradle-app || true
@@ -61,11 +61,11 @@ pipeline {
                 archiveArtifacts artifacts: 'build/libs/*.jar', fingerprint: true
             }
         }
-
-        post {
-            always {
-                sh 'docker logout'
-            }
+    }
+    post {
+        always {
+            sh 'docker logout'
         }
     }
+    
 }
