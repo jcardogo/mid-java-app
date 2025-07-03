@@ -28,6 +28,8 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh "docker build --rm -t $IMAGE_NAME:$IMAGE_TAG ."
+                sh "docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+
             }
         }
 
