@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         DOCKERHUB_CREDENTIALS_ID = 'dockerhub-jcardogo' // ID of the Docker Hub credentials stored in Jenkins
+        DOCKERHUB_USERNAME = 'jcardogo' // Docker Hub username
         IMAGE_NAME = 'mid-java-gradle-app' // Name of the Docker image to build
         IMAGE_TAG = "${BUILD_NUMBER}" // Tag for the Docker image, using the Jenkins build number
     }
@@ -26,7 +27,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t $IMAGE_NAME:$IMAGE_TAG .'
+                sh 'docker build --rm -t $IMAGE_NAME:$IMAGE_TAG .'
             }
         }
 
@@ -40,8 +41,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
-                sh 'docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_CREDENTIALS_ID/$IMAGE_NAME:$IMAGE_TAG'
-                sh 'docker push $DOCKERHUB_CREDENTIALS_ID/$IMAGE_NAME:$IMAGE_TAG'
+                sh 'docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG'
+                sh 'docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG'
             }
         }
 
@@ -51,7 +52,7 @@ pipeline {
                     docker pull $DOCKERHUB_CREDENTIALS_ID/$IMAGE_NAME:$IMAGE_TAG
                     docker stop mid-java-gradle-app || true
                     docker rm mid-java-gradle-app || true
-                    docker run -d --name mid-java-gradle-app -p 8085:8080 $DOCKERHUB_CREDENTIALS_ID/$IMAGE_NAME:$IMAGE_TAG
+                    docker run --rm -d --name mid-java-gradle-app -p 8085:8080 $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
                 '''
             }
         }
