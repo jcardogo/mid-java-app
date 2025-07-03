@@ -51,9 +51,6 @@ pipeline {
         stage('Deploy container') {
             steps {
                 sh "docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
-                sh '''    docker stop mid-java-gradle-app || true
-                    docker rm mid-java-gradle-app || true
-                '''
                 sh "docker run --rm -d --name mid-java-gradle-app -p 8085:8080 $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
             }
         }
