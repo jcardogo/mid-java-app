@@ -34,7 +34,11 @@ pipeline {
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    sh '''
+                    echo 'your-password' | docker login -u your-username --password-stdin
+                    echo "Logging in to Docker Hub as $DOCKER_USERNAME"
+                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin                
+                    '''
                 }
             }
         }
@@ -49,7 +53,7 @@ pipeline {
         stage('Deploy container') {
             steps {
                 sh '''
-                    docker pull $DOCKERHUB_CREDENTIALS_ID/$IMAGE_NAME:$IMAGE_TAG
+                    docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
                     docker stop mid-java-gradle-app || true
                     docker rm mid-java-gradle-app || true
                     docker run --rm -d --name mid-java-gradle-app -p 8085:8080 $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
