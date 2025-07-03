@@ -27,37 +27,33 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build --rm -t $IMAGE_NAME:$IMAGE_TAG .'
+                sh "docker build --rm -t $IMAGE_NAME:$IMAGE_TAG ."
             }
         }
 
         stage('Login to Docker Hub') {
             steps {
                 withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    sh '''
-                    echo 'your-password' | docker login -u your-username --password-stdin
-                    echo "Logging in to Docker Hub as $DOCKER_USERNAME"
-                    echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin                
-                    '''
+                    sh "echo ${DOCKER_PASS} | docker login -u ${DOCKER_USERNAME} --password-stdin"
+                    sh "docker push ${DOCKER_USERNAME}/${IMAGE_NAME}:${IMAGE_TAG}"
                 }
             }
         }
         stage('Push to Docker Hub') {
             steps {
-                sh 'docker push $IMAGE_NAME:$IMAGE_TAG'
-                sh 'docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG'
-                sh 'docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG'
+                sh "docker push $IMAGE_NAME:$IMAGE_TAG"
+                sh "docker tag $IMAGE_NAME:$IMAGE_TAG $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+                sh "docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
             }
         }
 
         stage('Deploy container') {
             steps {
-                sh '''
-                    docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
-                    docker stop mid-java-gradle-app || true
+                sh "docker pull $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
+                sh '''    docker stop mid-java-gradle-app || true
                     docker rm mid-java-gradle-app || true
-                    docker run --rm -d --name mid-java-gradle-app -p 8085:8080 $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG
                 '''
+                sh "docker run --rm -d --name mid-java-gradle-app -p 8085:8080 $DOCKERHUB_USERNAME/$IMAGE_NAME:$IMAGE_TAG"
             }
         }
 
