@@ -12,7 +12,7 @@ pipeline {
         gradle 'Gradle_8' // Name of Gradle version configured in Jenkins
     }
     
-    //2 this line is to test if the webhook is starting the jenkins pipeline on my laptop agent from github
+    //3 this line is to test if the webhook is starting the jenkins pipeline on my laptop agent from github
 
 
     stages {
