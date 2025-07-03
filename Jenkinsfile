@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKERHUB_CREDENTIALS_ID = 'dockerhub-jcardogo' // ID of the Docker Hub credentials stored in Jenkins
+        DOCKERHUB_CREDENTIALS_ID = 'dockerhub_jcardogo' // ID of the Docker Hub credentials stored in Jenkins
         DOCKERHUB_USERNAME = 'jcardogo' // Docker Hub username
         IMAGE_NAME = 'mid-java-gradle-app' // Name of the Docker image to build
         IMAGE_TAG = "${BUILD_NUMBER}" // Tag for the Docker image, using the Jenkins build number
